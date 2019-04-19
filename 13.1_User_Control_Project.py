@@ -1,23 +1,64 @@
 """
-Starting Template
-Once you have learned how to use classes, you can begin your program with this
-template.
-If Python and Arcade are installed, this example can be run from the command line with:
-python -m arcade.examples.starting_template
+USER CONTROL PROJECT
+-----------------
+Your choice!!! Have fun and be creative.
+Create a background and perhaps animate some objects.
+Pick a user control method and navigate an object around your screen.
+Make your object more interesting than a ball.
+Create your object with a new class.
+Perhaps move your object through a maze or move the object to avoid other moving objects.
+Incorporate some sound.
+Type the directions to this project below:
+
+DIRECTIONS:
+----------
+Please type directions for this game here.
 """
+
 import arcade
+import random
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Starting Template"
+SCREEN_TITLE = "13.1 User Control Project"
+ROCKET_SPEED = 5
+
+
+class Rocket:
+    def __init__(self, start_x, start_y):
+        self.rocket_x = start_x
+        self.rocket_y = start_y
+        self.dx = 0
+        self.dy = 0
+        self.color = random_color()
+
+    def draw_rocket(self):
+        arcade.draw_rectangle_filled(self.rocket_x, self.rocket_y, 30, 60, self.color)
+
+    def reset_pos(self):
+        pass
+
+    def update(self):
+        self.rocket_y += self.dy
+        self.rocket_x += self.dx
+
+        if self.rocket_y+30 >= SCREEN_HEIGHT:
+            self.rocket_y -= 1
+            self.dy = 0
+        elif self.rocket_y-30 <= 0:
+            self.rocket_y += 1
+            self.dy = 0
+        if self.rocket_x+15 >= SCREEN_WIDTH:
+            self.rocket_x -= 1
+            self.dx = 0
+        elif self.rocket_x - 15 <= 0:
+            self.rocket_x += 1
+            self.dx = 0
 
 
 class MyGame(arcade.Window):
     """
     Main application class.
-    NOTE: Go ahead and delete the methods you don't need.
-    If you do need a method, delete the 'pass' and replace it
-    with your own code. Don't leave 'pass' in this program.
     """
 
     def __init__(self, width, height, title):
@@ -27,61 +68,63 @@ class MyGame(arcade.Window):
 
         # If you have sprite lists, you should create them here,
         # and set them to None
+        self.rocket = None
 
     def setup(self):
         # Create your sprites and sprite lists here
-        pass
+        self.rocket = Rocket(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
     def on_draw(self):
         """
         Render the screen.
         """
-
         # This command should happen before we start drawing. It will clear
         # the screen to the background color, and erase what we drew last frame.
         arcade.start_render()
+        arcade.draw_text("Don't hit the objects!",
+                         SCREEN_WIDTH / 2, SCREEN_HEIGHT - 28, arcade.color.BLACK, 28, width=2000, align="center",
+                         anchor_x="center", anchor_y="center")
 
+        self.rocket.draw_rocket()
         # Call draw() on all your sprite lists below
 
-    def update(self, delta_time):
+    def on_update(self, delta_time):
         """
         All the logic to move, and the game logic goes here.
         Normally, you'll call update() on the sprite lists that
         need it.
         """
-        pass
+        self.rocket.update()
 
-    def on_key_press(self, key, key_modifiers):
-        """
-        Called whenever a key on the keyboard is pressed.
-        For a full list of keys, see:
-        http://arcade.academy/arcade.key.html
-        """
-        pass
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.LEFT:
+            self.rocket.dx -= ROCKET_SPEED
+        elif key == arcade.key.RIGHT:
+            self.rocket.dx += ROCKET_SPEED
+        elif key == arcade.key.UP:
+            self.rocket.dy += ROCKET_SPEED
+        elif key == arcade.key.DOWN:
+            self.rocket.dy -= ROCKET_SPEED
 
     def on_key_release(self, key, key_modifiers):
-        """
-        Called whenever the user lets off a previously pressed key.
-        """
-        pass
+        if key == arcade.key.LEFT or key == arcade.key.RIGHT:
+            self.rocket.dx = 0
+        if key == arcade.key.UP or key == arcade.key.DOWN:
+            self.rocket.dy = 0
 
     def on_mouse_motion(self, x, y, delta_x, delta_y):
-        """
-        Called whenever the mouse moves.
-        """
         pass
 
     def on_mouse_press(self, x, y, button, key_modifiers):
-        """
-        Called when the user presses a mouse button.
-        """
         pass
 
     def on_mouse_release(self, x, y, button, key_modifiers):
-        """
-        Called when a user releases a mouse button.
-        """
         pass
+
+
+def random_color():
+    return random.choice((arcade.color.RED, arcade.color.ORANGE, arcade.color.YELLOW,
+                          arcade.color.GREEN, arcade.color.BLUE, arcade.color.VIOLET))
 
 
 def main():
