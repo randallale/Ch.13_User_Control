@@ -64,10 +64,10 @@ class Rocket(object):
 
     def get_location(self, area):
         if area == "left":
-            rocket_left = self.rocket_x - 15
+            rocket_left = self.rocket_x - 30
             return rocket_left
         elif area == "right":
-            rocket_right = self.rocket_x + 15
+            rocket_right = self.rocket_x + 30
             return rocket_right
         elif area == "top":
             rocket_top = self.rocket_y + 30
@@ -97,16 +97,16 @@ class Objects(Rocket):
 
     def get_location(self, area):
         if area == "left":
-            object_x_left = self.object_x-4
+            object_x_left = self.object_x-8
             return object_x_left
         elif area == "right":
-            object_x_right = self.object_x+4
+            object_x_right = self.object_x+8
             return object_x_right
         elif area == "top":
-            object_y_top = self.object_y+4
+            object_y_top = self.object_y+8
             return object_y_top
         elif area == "bottom":
-            object_y_bottom = self.object_y-4
+            object_y_bottom = self.object_y-8
             return object_y_bottom
 
     def stop(self):
@@ -167,6 +167,7 @@ class MyGame(arcade.Window):
         """
         for self.object in self.object_list:
             self.object.update()
+            # Checks if object is inside the rocket
             if self.rocket.get_location("left") < self.object.get_location("left") and \
                     self.rocket.get_location("right") > self.object.get_location("right") and \
                     self.rocket.get_location("top") > self.object.get_location("top") and \
