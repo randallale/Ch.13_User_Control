@@ -21,7 +21,7 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "13.1 User Control Project"
 ROCKET_SPEED = 5
-OBJECT_AMOUNT = 10
+OBJECT_AMOUNT = 20
 
 
 class Rocket(object):
@@ -41,6 +41,9 @@ class Rocket(object):
     def reset_pos(self):
         self.rocket_x = SCREEN_WIDTH/2
         self.rocket_y = SCREEN_HEIGHT/4
+        self.rocket_color = random_color()
+        self.dx = 0
+        self.dy = 0
 
     def update(self):
         self.rocket_y += self.dy
@@ -86,14 +89,11 @@ class Objects(Rocket):
 
     def update(self):
         self.object_y -= self.speed
-        print()
         if self.object_y <= -10:
             self.object_y = random.randrange(SCREEN_HEIGHT, SCREEN_HEIGHT+100)
             self.object_x = random.randrange(0, SCREEN_WIDTH)
             self.object_color = random_color()
             self.speed = random.randrange(2, 4)
-        if self.object_x == 0:
-            pass
 
     def get_location(self, area):
         if area == "left":
@@ -131,6 +131,8 @@ class MyGame(arcade.Window):
         self.object = None
         self.rocket = None
         self.score = 0
+        self.end = False
+        self.endscore = None
 
     def setup(self):
         # Create your sprites and sprite lists here
@@ -150,6 +152,12 @@ class MyGame(arcade.Window):
         for self.object in self.object_list:
             self.object.draw_object()
         self.rocket.draw_rocket()
+        if self.end is True:
+            self.endscore = f'Your score is {self.score}'
+            arcade.draw_text(self.endscore, SCREEN_WIDTH / 2, 28, arcade.color.BLACK, 28,
+                             width=2000, align="center", anchor_x="center", anchor_y="center")
+            arcade.draw_text("Press space to reset!", SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, arcade.color.BLACK, 50,
+                             width=2000, align="center", anchor_x="center", anchor_y="center")
 
     def on_update(self, delta_time):
         """
@@ -164,14 +172,15 @@ class MyGame(arcade.Window):
                     self.rocket.get_location("top") > self.object.get_location("top") and \
                     self.rocket.get_location("bottom") < self.object.get_location("bottom"):
                 if self.rocket.rocket_color == self.object.object_color:
-                    self.score += 1
                     self.object.reset_pos()
+                    self.score += 1
                     self.rocket.rocket_color = random_color()
                 elif self.rocket.rocket_color != self.object.object_color:
                     self.object.reset_pos()
                     self.rocket.rocket_color = arcade.color.BLACK
-                    self.object.stop()
-                    arcade.draw_text(("Your Score was", self.score), SCREEN_WIDTH/2,20,arcade.color.BLACK,20,width=2000,align="center",anchor_x="center, anchor_y="center"
+                    for self.object in self.object_list:
+                        self.object.stop()
+                    self.end = True
         self.rocket.update()
 
     def on_key_press(self, key, modifiers):
@@ -183,6 +192,13 @@ class MyGame(arcade.Window):
             self.rocket.dy += ROCKET_SPEED
         elif key == arcade.key.DOWN:
             self.rocket.dy -= ROCKET_SPEED
+        if self.end is True:
+            if key == arcade.key.SPACE:
+                self.end = False
+                self.score = 0
+                self.rocket.reset_pos()
+                for self.object in self.object_list:
+                    self.object.reset_pos()
 
     def on_key_release(self, key, key_modifiers):
         if key == arcade.key.LEFT or key == arcade.key.RIGHT:
@@ -198,7 +214,6 @@ class MyGame(arcade.Window):
 
     def on_mouse_release(self, x, y, button, key_modifiers):
         pass
-
 
 def random_color():
     return random.choice((arcade.color.RED, arcade.color.ORANGE, arcade.color.YELLOW,
