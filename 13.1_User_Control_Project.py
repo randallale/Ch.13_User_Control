@@ -17,11 +17,28 @@ Please type directions for this game here.
 
 import arcade
 import random
-
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "13.1 User Control Project"
 ROCKET_SPEED = 5
+OBJECT_AMOUNT = 50
+
+
+class Objects:
+    def __init__(self, start_x, start_y):
+        self.object_x = start_x
+        self.object_y = start_y
+        self.color = random_color()
+        self.speed = random.randrange(2, 4)
+
+    def draw_object(self):
+        arcade.draw_circle_filled(self.object_x, self.object_y, 8, self.color)
+
+    def update(self):
+        self.object_y -= self.speed
+        if self.object_y <= -10:
+            self.object_y = random.randrange(SCREEN_HEIGHT, SCREEN_HEIGHT+100)
+            self.speed = random.randrange(2, 4)
 
 
 class Rocket:
@@ -33,19 +50,23 @@ class Rocket:
         self.color = random_color()
 
     def draw_rocket(self):
+        tip_list = ((self.rocket_x - 15, self.rocket_y + 30), (self.rocket_x, self.rocket_y + 45),
+                    (self.rocket_x + 15, self.rocket_y + 30))
         arcade.draw_rectangle_filled(self.rocket_x, self.rocket_y, 30, 60, self.color)
+        arcade.draw_polygon_filled(tip_list, self.color)
 
     def reset_pos(self):
-        pass
+        self.rocket_x = SCREEN_WIDTH/2
+        self.rocket_y = SCREEN_HEIGHT/4
 
     def update(self):
         self.rocket_y += self.dy
         self.rocket_x += self.dx
 
-        if self.rocket_y+30 >= SCREEN_HEIGHT:
+        if self.rocket_y+45 >= SCREEN_HEIGHT:
             self.rocket_y -= 1
             self.dy = 0
-        elif self.rocket_y-30 <= 0:
+        elif self.rocket_y-45 <= 0:
             self.rocket_y += 1
             self.dy = 0
         if self.rocket_x+15 >= SCREEN_WIDTH:
@@ -57,10 +78,6 @@ class Rocket:
 
 
 class MyGame(arcade.Window):
-    """
-    Main application class.
-    """
-
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
 
@@ -68,25 +85,28 @@ class MyGame(arcade.Window):
 
         # If you have sprite lists, you should create them here,
         # and set them to None
+        self.object_list = []
+        self.object = None
         self.rocket = None
 
     def setup(self):
         # Create your sprites and sprite lists here
-        self.rocket = Rocket(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        for i in range(OBJECT_AMOUNT):
+            self.object = Objects(random.randrange(0, SCREEN_WIDTH+1),
+                                  random.randrange(SCREEN_HEIGHT, SCREEN_HEIGHT+200))
+            self.object_list.append(self.object)
+        self.rocket = Rocket(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
 
     def on_draw(self):
-        """
-        Render the screen.
-        """
-        # This command should happen before we start drawing. It will clear
-        # the screen to the background color, and erase what we drew last frame.
         arcade.start_render()
         arcade.draw_text("Don't hit the objects!",
                          SCREEN_WIDTH / 2, SCREEN_HEIGHT - 28, arcade.color.BLACK, 28, width=2000, align="center",
                          anchor_x="center", anchor_y="center")
 
-        self.rocket.draw_rocket()
         # Call draw() on all your sprite lists below
+        self.rocket.draw_rocket()
+        for self.object in self.object_list:
+            self.object.draw_object()
 
     def on_update(self, delta_time):
         """
@@ -95,6 +115,8 @@ class MyGame(arcade.Window):
         need it.
         """
         self.rocket.update()
+        for self.object in self.object_list:
+            self.object.update()
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.LEFT:
