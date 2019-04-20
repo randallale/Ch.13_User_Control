@@ -17,6 +17,7 @@ Please type directions for this game here.
 
 import arcade
 import random
+
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "13.1 User Control Project"
@@ -132,10 +133,15 @@ class MyGame(arcade.Window):
         self.rocket = None
         self.score = 0
         self.end = False
+        self.numbers = []
         self.endscore = None
+        self.f = 0
 
     def setup(self):
         # Create your sprites and sprite lists here
+        self.f = open("Highscore.txt", "a+")
+        self.f.close()
+        self.sort_score()
         for i in range(OBJECT_AMOUNT):
             self.object = Objects(random.randrange(0, SCREEN_WIDTH+1),
                                   random.randrange(SCREEN_HEIGHT, SCREEN_HEIGHT+200))
@@ -146,6 +152,10 @@ class MyGame(arcade.Window):
         arcade.start_render()
         arcade.draw_text("Only hit your color!",
                          SCREEN_WIDTH / 2, SCREEN_HEIGHT - 28, arcade.color.BLACK, 28, width=2000, align="center",
+                         anchor_x="center", anchor_y="center")
+        self.sort_score()
+        arcade.draw_text(f'The highscore is {self.numbers[-1]}!',
+                         SCREEN_WIDTH / 10, + 15, arcade.color.BLACK, 15, width=2000, align="center",
                          anchor_x="center", anchor_y="center")
 
         # Call draw() on all your sprite lists below
@@ -196,10 +206,14 @@ class MyGame(arcade.Window):
         if self.end is True:
             if key == arcade.key.SPACE:
                 self.end = False
+                self.f = open("Highscore.txt", "a+")
+                self.f.write(f"{self.score}\r")
+                self.f.close()
                 self.score = 0
                 self.rocket.reset_pos()
                 for self.object in self.object_list:
                     self.object.reset_pos()
+                self.sort_score()
 
     def on_key_release(self, key, key_modifiers):
         if key == arcade.key.LEFT or key == arcade.key.RIGHT:
@@ -215,6 +229,14 @@ class MyGame(arcade.Window):
 
     def on_mouse_release(self, x, y, button, key_modifiers):
         pass
+
+    def sort_score(self):
+        with open('Highscore.txt', 'r') as f:
+            lines = f.readlines()
+        self.numbers = [int(e.strip()) for e in lines]
+        self.numbers.sort()
+        f.close()
+
 
 def random_color():
     return random.choice((arcade.color.RED, arcade.color.ORANGE, arcade.color.YELLOW,
