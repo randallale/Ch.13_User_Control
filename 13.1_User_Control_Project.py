@@ -36,8 +36,7 @@ class Rocket(object):
     def draw_rocket(self):
         tip_list = ((self.rocket_x - 15, self.rocket_y + 30), (self.rocket_x, self.rocket_y + 45),
                     (self.rocket_x + 15, self.rocket_y + 30))
-        arcade.draw_rectangle_filled(self.rocket_x, self.rocket_y, 30, 60, self.rocket_color)
-        arcade.draw_polygon_filled(tip_list, self.rocket_color)
+        arcade.draw_rectangle_filled(self.rocket_x, self.rocket_y, 30, 30, self.rocket_color)
 
     def reset_pos(self):
         self.rocket_x = SCREEN_WIDTH/2
@@ -50,10 +49,10 @@ class Rocket(object):
         self.rocket_y += self.dy
         self.rocket_x += self.dx
 
-        if self.rocket_y+45 >= SCREEN_HEIGHT:
+        if self.rocket_y+15 >= SCREEN_HEIGHT:
             self.rocket_y -= 1
             self.dy = 0
-        elif self.rocket_y-30 <= 0:
+        elif self.rocket_y-15 <= 0:
             self.rocket_y += 1
             self.dy = 0
         if self.rocket_x+15 >= SCREEN_WIDTH:
@@ -150,12 +149,12 @@ class MyGame(arcade.Window):
 
     def on_draw(self):
         arcade.start_render()
-        arcade.draw_text("Only hit your color!",
+        arcade.draw_text("Only Hit Your Color!",
                          SCREEN_WIDTH / 2, SCREEN_HEIGHT - 28, arcade.color.BLACK, 28, width=2000, align="center",
                          anchor_x="center", anchor_y="center")
         self.sort_score()
-        arcade.draw_text(f'The highscore is {self.numbers[-1]}!',
-                         SCREEN_WIDTH / 10, + 15, arcade.color.BLACK, 15, width=2000, align="center",
+        arcade.draw_text(f'The Highscore is {self.numbers[-1]}!',
+                         SCREEN_WIDTH / 8, + 15, arcade.color.BLACK, 15, width=2000, align="center",
                          anchor_x="center", anchor_y="center")
 
         # Call draw() on all your sprite lists below
@@ -163,10 +162,10 @@ class MyGame(arcade.Window):
             self.object.draw_object()
         self.rocket.draw_rocket()
         if self.end is True:
-            self.endscore = f'Your score is {self.score}'
+            self.endscore = f'Your Score Is {self.score}'
             arcade.draw_text(self.endscore, SCREEN_WIDTH / 2, 28, arcade.color.BLACK, 28,
                              width=2000, align="center", anchor_x="center", anchor_y="center")
-            arcade.draw_text("Press space to reset!", SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, arcade.color.BLACK, 50,
+            arcade.draw_text("Press Space To Reset!", SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, arcade.color.BLACK, 50,
                              width=2000, align="center", anchor_x="center", anchor_y="center")
 
     def on_update(self, delta_time):
